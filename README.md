@@ -69,12 +69,12 @@ Create a REST‑style API that lets clients query seat availability.
   "filmTitle": "Space Odyssey",
   "startTime": "19:00",
   "seats": [
-    { "row": "A", "seat": 1, "status": "booked" },
-    { "row": "A", "seat": 2, "status": "booked" },
-    { "row": "A", "seat": 3, "status": "booked" },
-    { "row": "B", "seat": 1, "status": "booked" },
-    { "row": "B", "seat": 2, "status": "booked" },
-    { "row": "B", "seat": 3, "status": "available" }
+    { "row": "A", "number": 1, "status": "booked" },
+    { "row": "A", "number": 2, "status": "booked" },
+    { "row": "A", "number": 3, "status": "booked" },
+    { "row": "B", "number": 1, "status": "booked" },
+    { "row": "B", "number": 2, "status": "booked" },
+    { "row": "B", "number": 3, "status": "available" }
   ]
 }
 ```
@@ -95,7 +95,7 @@ If you complete the core requirements early, feel free to tackle any of these ad
 
 ## Notes & Constraints
 
-- Target .NET 8 (or latest LTS). Minimal APIs, MVC controllers or both — your choice. If neccessary, you can also clone a basic API from here: [Link](./Cinema.API/)
+- Target .NET 8 (or latest LTS). Minimal APIs, MVC controllers or both — your choice. If neccessary, you can also clone a basic API from here: [Link](./NET8/)
 - Hard-code the feed URL, but keep the design flexible for future endpoint replacement.
 - No authentication logic required.
 - Prioritise readability, separation of concerns and meaningful tests — 100% coverage is not required.
