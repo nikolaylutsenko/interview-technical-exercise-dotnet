@@ -1,7 +1,9 @@
-using Cinema.Domain.Models;
-using Cinema.Infrastructure.Clients;
-
 namespace Cinema.Infrastructure.Services;
+
+using Application.DTOs;
+using Application.Interfaces;
+using Application.Models;
+using Clients.Models;
 
 public class SeatMapService : ISeatMapService
 {
@@ -12,15 +14,62 @@ public class SeatMapService : ISeatMapService
         _seatMap = seatMap;
     }
 
-    public Task<bool> CheckSeatAvailability(string id)
+    public Task<SeatAvailabilityApiModel> CheckSeatAvailability(string id)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<SeatPlan> GetSeatPlan()
+    public async Task<List<SeatPlanApiModel>> GetSeatPlans()
     {
-        var seatPlan = await _seatMap.GetSeatMap();
+        var seatPlans =
+            await _seatMap.GetSeatMap<SeatMapApiModel[]>() ?? throw new InvalidDataException();
 
-        return null;
+        return seatPlans.Select(ToApiModel).ToList();
+    }
+
+    private SeatPlanApiModel ToApiModel(SeatMapApiModel seatMap)
+    {
+        return new SeatPlanApiModel
+        {
+            Auditorium = seatMap.Auditorium,
+            FilmTitle = seatMap.FilmTitle,
+            StartTime = DateTimeOffset
+                .FromUnixTimeSeconds(long.Parse(seatMap.StartTime))
+                .ToLocalTime()
+                .ToString("hh:mm"),
+            Seats = Calculate(seatMap.SeatRows),
+        };
+    }
+
+    private List<Seat> Calculate(Dictionary<string, string> seatRows)
+    {
+        var seats = new List<Seat>();
+
+        foreach (var row in seatRows)
+        {
+            var rowSeats = row.Value.ToCharArray();
+            for (int i = 1; i < rowSeats.Length; i++)
+            {
+                var seat = new Seat
+                {
+                    Row = row.Key,
+                    Number = i,
+                    Status = ToStatus(rowSeats[i]),
+                };
+                seats.Add(seat);
+            }
+        }
+
+        return seats;
+    }
+
+    private Status ToStatus(char statusChar)
+    {
+        if (statusChar == '0')
+            return Status.Available;
+        else if (statusChar == '1')
+            return Status.Booked;
+        else
+            throw new ArgumentOutOfRangeException();
     }
 }

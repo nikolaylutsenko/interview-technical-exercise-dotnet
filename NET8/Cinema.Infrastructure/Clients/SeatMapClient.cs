@@ -1,21 +1,30 @@
-using System.Net.Http.Json;
-using Cinema.Infrastructure.Clients.Models;
-
 namespace Cinema.Infrastructure.Clients;
+
+using System.Net.Http.Json;
+using System.Text.Json;
+using Cinema.Application.Interfaces;
 
 public class SeatMapClient : ISeatMapClient
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public SeatMapClient(HttpClient httpClient)
+    public SeatMapClient(IHttpClientFactory httpClientFactory)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<SeatMap?> GetSeatMap()
+    public async Task<T?> GetSeatMap<T>()
     {
-        return await _httpClient.GetFromJsonAsync<SeatMap>(
-            "https://raw.githubusercontent.com/DataArtInc/interview-technical-exercise/main/seatmap-example.json"
-        );
+        var httpClient = _httpClientFactory.CreateClient();
+        var url =
+            "https://raw.githubusercontent.com/DataArtInc/interview-technical-exercise/main/seatmap-example.json";
+
+        var options = new JsonSerializerOptions { AllowTrailingCommas = true };
+
+        var response = await httpClient.GetFromJsonAsync<T>(url, options);
+        if (response == null)
+            throw new HttpRequestException($"Request to '{url}' failed or returned no content");
+
+        return response;
     }
 }

@@ -1,7 +1,18 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Cinema.API;
+using Cinema.Application.Interfaces;
+using Cinema.Infrastructure.Clients;
 using Cinema.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(
+        new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+    );
+});
 
 builder.Services.AddControllers();
 
@@ -15,7 +26,10 @@ builder.Services.AddOpenApiDocument(config =>
     config.Version = "v1";
 });
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<ISeatMapService, SeatMapService>();
+builder.Services.AddScoped<ISeatMapClient, SeatMapClient>();
 
 var app = builder.Build();
 

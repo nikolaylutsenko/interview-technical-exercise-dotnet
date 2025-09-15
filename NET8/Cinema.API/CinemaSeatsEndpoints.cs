@@ -1,6 +1,6 @@
 namespace Cinema.API;
 
-using Cinema.Infrastructure.Services;
+using Application.Interfaces;
 
 public static class CinemaSeatsEndpoints
 {
@@ -10,7 +10,7 @@ public static class CinemaSeatsEndpoints
 
         cinemaSeats.MapGet(
             "/plan",
-            async (ISeatMapService seatMapService) => await seatMapService.GetSeatPlan()
+            async (ISeatMapService seatMapService) => await seatMapService.GetSeatPlans()
         );
 
         cinemaSeats.MapGet(

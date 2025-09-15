@@ -1,20 +1,14 @@
 using System.Text.Json.Serialization;
 
-namespace Cinema.API.ApiModels;
+namespace Cinema.Application.Models;
 
-public record SeatAvailabilityApiModel
-{
-    [JsonPropertyName("available")]
-    public bool Available { get; set; }
-};
-
-public record SeatPlanApiModel
+public record SeatPlan
 {
     [JsonPropertyName("auditorium")]
     public string? Auditorium { get; set; }
 
     [JsonPropertyName("filmTitle")]
-    public string? filmTitle { get; set; }
+    public string? FilmTitle { get; set; }
 
     [JsonPropertyName("startTime")]
     public TimeSpan StartTime { get; set; }
@@ -33,10 +27,4 @@ public record SeatPlanApiModel
         [JsonPropertyName("status")]
         public Status Status { get; set; }
     }
-}
-
-public enum Status
-{
-    Available = 100,
-    Booked = 200,
 }
