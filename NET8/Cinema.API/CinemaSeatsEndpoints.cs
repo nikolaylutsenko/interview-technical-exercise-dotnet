@@ -14,9 +14,13 @@ public static class CinemaSeatsEndpoints
         );
 
         cinemaSeats.MapGet(
-            "/check/{id}",
-            async (string id, ISeatMapService seatMapService) =>
-                await seatMapService.CheckSeatAvailability(id)
+            "/check/{auditorium}/{filmTitle}/{seatRowNumber}",
+            async (
+                string auditorium,
+                string filmTitle,
+                string seatRowNumber,
+                ISeatMapService seatMapService
+            ) => await seatMapService.CheckSeatAvailability(auditorium, filmTitle, seatRowNumber)
         );
     }
 }

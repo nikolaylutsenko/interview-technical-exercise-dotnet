@@ -2,8 +2,6 @@ namespace Cinema.Infrastructure.Services;
 
 using Application.DTOs;
 using Application.Interfaces;
-using Application.Models;
-using Clients.Models;
 
 public class SeatMapService : ISeatMapService
 {
@@ -14,62 +12,44 @@ public class SeatMapService : ISeatMapService
         _seatMap = seatMap;
     }
 
-    public Task<SeatAvailabilityApiModel> CheckSeatAvailability(string id)
+    public async Task<SeatAvailabilityApiModel> CheckSeatAvailability(
+        string auditorium,
+        string filmTitle,
+        string seatRowNumber
+    )
     {
-        throw new NotImplementedException();
+        var seatPlans = await _seatMap.GetSeatPlans() ?? throw new InvalidDataException();
+        var seatPlan =
+            seatPlans.FirstOrDefault(sp =>
+                sp.Auditorium.Equals(auditorium, StringComparison.OrdinalIgnoreCase)
+                && sp.FilmTitle.Equals(filmTitle, StringComparison.OrdinalIgnoreCase)
+            ) ?? throw new KeyNotFoundException("Seat plan not found");
+
+        return new SeatAvailabilityApiModel { Available = seatPlan.IsSeatAvailable(seatRowNumber) };
     }
 
     public async Task<List<SeatPlanApiModel>> GetSeatPlans()
     {
-        var seatPlans =
-            await _seatMap.GetSeatMap<SeatMapApiModel[]>() ?? throw new InvalidDataException();
+        var seatPlans = await _seatMap.GetSeatPlans() ?? throw new InvalidDataException();
 
         return seatPlans.Select(ToApiModel).ToList();
     }
 
-    private SeatPlanApiModel ToApiModel(SeatMapApiModel seatMap)
+    private SeatPlanApiModel ToApiModel(Domain.Models.SeatPlan seatPlan)
     {
         return new SeatPlanApiModel
         {
-            Auditorium = seatMap.Auditorium,
-            FilmTitle = seatMap.FilmTitle,
-            StartTime = DateTimeOffset
-                .FromUnixTimeSeconds(long.Parse(seatMap.StartTime))
-                .ToLocalTime()
-                .ToString("hh:mm"),
-            Seats = Calculate(seatMap.SeatRows),
-        };
-    }
-
-    private List<Seat> Calculate(Dictionary<string, string> seatRows)
-    {
-        var seats = new List<Seat>();
-
-        foreach (var row in seatRows)
-        {
-            var rowSeats = row.Value.ToCharArray();
-            for (int i = 1; i < rowSeats.Length; i++)
-            {
-                var seat = new Seat
+            Auditorium = seatPlan.Auditorium,
+            FilmTitle = seatPlan.FilmTitle,
+            StartTime = seatPlan.StartTime.ToString("hh:mm"),
+            Seats = seatPlan
+                .Seats.Select(seat => new Seat
                 {
-                    Row = row.Key,
-                    Number = i,
-                    Status = ToStatus(rowSeats[i]),
-                };
-                seats.Add(seat);
-            }
-        }
-
-        return seats;
-    }
-
-    private Status ToStatus(char statusChar)
-    {
-        if (statusChar == '0')
-            return Status.Available;
-        else if (statusChar == '1')
-            return Status.Booked;
-        else
-            throw new ArgumentOutOfRangeException();
+                    Row = seat.Row,
+                    Number = seat.Number,
+                    Status = seat.Status,
+                })
+                .ToList(),
+        };
     }
 }

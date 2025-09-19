@@ -1,31 +1,31 @@
-using System.Text.Json.Serialization;
-using Cinema.Application.Models;
-
 namespace Cinema.Application.DTOs;
+
+using System.Text.Json.Serialization;
+using Domain.Models;
 
 public record SeatPlanApiModel
 {
     [JsonPropertyName("auditorium")]
-    public string? Auditorium { get; set; }
+    public required string Auditorium { get; set; }
 
     [JsonPropertyName("filmTitle")]
-    public string? FilmTitle { get; set; }
+    public required string FilmTitle { get; set; }
 
     [JsonPropertyName("startTime")]
     public required string StartTime { get; set; }
 
     [JsonPropertyName("seatRows")]
-    public List<Seat>? Seats { get; set; }
+    public required List<Seat> Seats { get; set; }
 }
 
 public class Seat
 {
     [JsonPropertyName("row")]
-    public string? Row { get; set; }
+    public required string Row { get; set; }
 
     [JsonPropertyName("number")]
-    public int Number { get; set; }
+    public required int Number { get; set; }
 
     [JsonPropertyName("status")]
-    public Status Status { get; set; }
+    public required Status Status { get; set; }
 }

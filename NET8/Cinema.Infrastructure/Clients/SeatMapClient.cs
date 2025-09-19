@@ -2,7 +2,10 @@ namespace Cinema.Infrastructure.Clients;
 
 using System.Net.Http.Json;
 using System.Text.Json;
-using Cinema.Application.Interfaces;
+using Application.Interfaces;
+using Clients.Models;
+using Domain.Models;
+using Mappers;
 
 public class SeatMapClient : ISeatMapClient
 {
@@ -13,18 +16,20 @@ public class SeatMapClient : ISeatMapClient
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<T?> GetSeatMap<T>()
+    public async Task<List<SeatPlan>> GetSeatPlans()
     {
         var httpClient = _httpClientFactory.CreateClient();
         var url =
-            "https://raw.githubusercontent.com/DataArtInc/interview-technical-exercise/main/seatmap-example.json";
+            "https://raw.githubusercontent.com/DataArtInc/interview-technical-exercise/main/seatmap-example.json"; //TODO: move to secrets
 
         var options = new JsonSerializerOptions { AllowTrailingCommas = true };
 
-        var response = await httpClient.GetFromJsonAsync<T>(url, options);
+        var response = await httpClient.GetFromJsonAsync<SeatMapApiModel[]>(url, options);
         if (response == null)
             throw new HttpRequestException($"Request to '{url}' failed or returned no content");
 
-        return response;
+        var seatPlan = response.Select(SeatMapMapper.ToDomain).ToList();
+
+        return seatPlan;
     }
 }

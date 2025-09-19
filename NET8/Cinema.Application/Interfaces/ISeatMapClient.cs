@@ -1,6 +1,8 @@
 namespace Cinema.Application.Interfaces;
 
+using Domain.Models;
+
 public interface ISeatMapClient
 {
-    Task<T?> GetSeatMap<T>();
+    Task<List<SeatPlan>> GetSeatPlans();
 }
