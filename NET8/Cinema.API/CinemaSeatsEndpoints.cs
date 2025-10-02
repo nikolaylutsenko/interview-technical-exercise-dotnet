@@ -10,7 +10,12 @@ public static class CinemaSeatsEndpoints
 
         cinemaSeats.MapGet(
             "/plan",
-            async (ISeatMapService seatMapService) => await seatMapService.GetSeatPlans()
+            async (ISeatMapService seatMapService, ILogger<Program> logger) =>
+            {
+                var result = await seatMapService.GetSeatPlans();
+
+                return TypedResults.Ok(result);
+            }
         );
 
         cinemaSeats.MapGet(
@@ -20,7 +25,16 @@ public static class CinemaSeatsEndpoints
                 string filmTitle,
                 string seatRowNumber,
                 ISeatMapService seatMapService
-            ) => await seatMapService.CheckSeatAvailability(auditorium, filmTitle, seatRowNumber)
+            ) =>
+            {
+                var result = await seatMapService.CheckSeatAvailability(
+                    auditorium,
+                    filmTitle,
+                    seatRowNumber
+                );
+
+                return TypedResults.Ok(result);
+            }
         );
     }
 }

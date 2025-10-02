@@ -16,6 +16,13 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddMemoryCache(opt =>
+{
+    opt.SizeLimit = 1024 * 1024 * 200; // 200 MiB
+    opt.CompactionPercentage = 0.2;
+    opt.ExpirationScanFrequency = TimeSpan.FromMinutes(5);
+});
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddEndpointsApiExplorer();

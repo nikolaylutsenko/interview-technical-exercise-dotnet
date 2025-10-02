@@ -2,6 +2,7 @@ namespace Cinema.Infrastructure.Services;
 
 using Application.DTOs;
 using Application.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 public class SeatMapService : ISeatMapService
 {
